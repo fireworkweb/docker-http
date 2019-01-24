@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-WORKDIR /var/www/html
+WORKDIR /app
 
 COPY default.conf /etc/nginx/conf.d/default.conf
 
