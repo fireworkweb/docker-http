@@ -1,0 +1,27 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@master
+
+    - name: Build image
+      run: docker build --pull -t fireworkweb/http:latest .
+
+    - name: Test docker images
+      run: |
+        docker run fireworkweb/http:latest nginx -v
+
+    - name: Push to Hub
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+        docker push fireworkweb/http:latest
