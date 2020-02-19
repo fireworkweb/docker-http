@@ -1,5 +1,7 @@
 FROM nginx:alpine
 
+ENV ASUSER 0
+
 WORKDIR /app
 
 RUN adduser -D -u 1337 fwd \
