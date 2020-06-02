@@ -5,17 +5,20 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [static, php]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@master
 
     - name: Build image
-      run: docker build --pull -t fireworkweb/http:latest .
+      run: docker build --pull -t fireworkweb/http:${{ matrix.version }} ${{ matrix.version }}
 
     - name: Test docker images
       run: |
-        docker run fireworkweb/http:latest nginx -v
+        docker run fireworkweb/http:${{ matrix.version }} nginx -v
 
     - name: Push to Hub
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -24,4 +27,4 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-        docker push fireworkweb/http:latest
+        docker push fireworkweb/http:${{ matrix.version }}
